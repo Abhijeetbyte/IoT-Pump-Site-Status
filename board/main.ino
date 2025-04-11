@@ -98,9 +98,10 @@ void activateGPRS() {
 }
 
 void sendPing(double currentValue, String timestamp) {
-    String url = "http://iot.navmarg.in/sitedata.php?current=" + String(currentValue, 3) +
+    String url = "http://iot.navmarg.in/sitepump/api.php?current=" + String(currentValue, 3) +
                  "&timestamp=" + timestamp +
-                 "&timezone=Asia/Kolkata&status=1";
+                 "&timezone=Asia/Kolkata"
+                 "&deviceId=01xd02m25";   // hardware, device id
     Serial.println("Sending Data: " + url);
     sendATCommand("AT+HTTPTERM", 2000);
     sendATCommand("AT+HTTPINIT");
