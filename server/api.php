@@ -12,10 +12,10 @@
  *  for each device in JSON format. It validates registered devices, checks input
  *  sanitization, and handles folder/file creation.
  * 
- *  Author: Abhijeet Kumar (TeamSense - IIT Patna)
+ *  Author: Abhijeet Kumar
  *  Created On: April 11, 2025
- *  Last Modified: April 11, 2025
- *  Version: 1.0
+ *  Last Modified: April 17, 2025
+ *  Version: 1.1
  * 
  *  Usage:
  *  ------
