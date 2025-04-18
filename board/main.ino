@@ -5,7 +5,7 @@
 #define ADC_MAX 4095.0    // 12-bit ADC max value
 #define REF_VOLTAGE 3.3   // ESP32 ADC reference voltage
 #define CALIBRATION 7.0   // Adjust this based on testing
-#define THRESHOLD 4.0     // Current threshold (3 amps)
+#define THRESHOLD 2.0     // Current threshold (2 amps)
 
 EnergyMonitor emon1;
 
@@ -26,13 +26,15 @@ DS1307 rtc;
 HardwareSerial sim800(1);
 bool gprsActive = false;
 
-// Function Prototypes
+// Helper Functions
 String readRTC();
 double readCurrent();
 void sendATCommand(String command, int timeout = 2000);
 void activateGPRS();
 void deactivateGPRS();
 void sendPing(double currentValue, String timestamp);
+
+
 
 void setup() {
     Serial.begin(115200);
@@ -45,9 +47,12 @@ void setup() {
     delay(3000);
 }
 
+
+
 void loop() {
     double currentValue = readCurrent();
     String timestamp = readRTC();
+
     Serial.printf("Current: %.3f A, Timestamp: %s\n", currentValue, timestamp.c_str());
     
     if (currentValue > THRESHOLD) {
@@ -55,15 +60,22 @@ void loop() {
             activateGPRS();
             gprsActive = true;
         }
-        sendPing(currentValue, timestamp);
+
+        sendPing(currentValue, timestamp); //Call HTTP ping function, send URL parameters
+
     } else {
         if (gprsActive) {
             deactivateGPRS();
             gprsActive = false;
         }
     }
-    delay(5000);
+    delay(5000); // delay 5 seconds, in between pings
 }
+
+
+
+
+
 
 String readRTC() {
     rtc.get(&sec, &minute, &hour, &day, &month, &year);
@@ -72,12 +84,14 @@ String readRTC() {
     return String(timestamp);
 }
 
+
+
 double readCurrent() {
     int rawADC = analogRead(CT_SENSOR_PIN);
     float adcVoltage = (rawADC / ADC_MAX) * REF_VOLTAGE;
     double Irms = emon1.calcIrms(1480);
     Serial.printf("Raw ADC: %d | ADC Voltage: %.3fV | Current: %.3fA\n", rawADC, adcVoltage, Irms);
-    Irms = 4.5; // Debug value
+    //Irms = 4.5; // Debug value
     return Irms;
 }
 
@@ -91,11 +105,13 @@ void activateGPRS() {
     sendATCommand("AT+SAPBR=0,1", 3000);
     sendATCommand("AT+SAPBR=0,1", 3000);
     sendATCommand("AT+SAPBR=3,1,\"Contype\",\"GPRS\"");
-    sendATCommand("AT+SAPBR=3,1,\"APN\",\"www\"");
+    sendATCommand("AT+SAPBR=3,1,\"APN\",\"www\"");   // APN here
     sendATCommand("AT+SAPBR=1,1", 5000);
     sendATCommand("AT+SAPBR=2,1");
     Serial.println("GPRS Activated");
 }
+
+
 
 void sendPing(double currentValue, String timestamp) {
     String url = "http://iot.navmarg.in/sitepump/api.php?current=" + String(currentValue, 3) +
@@ -112,11 +128,14 @@ void sendPing(double currentValue, String timestamp) {
     sendATCommand("AT+HTTPTERM");
 }
 
+
 void deactivateGPRS() {
     Serial.println("Deactivating GPRS...");
     sendATCommand("AT+SAPBR=0,1");
     Serial.println("GPRS Disconnected");
 }
+
+
 
 void sendATCommand(String command, int timeout) {
     Serial.println("Sending: " + command);
