@@ -105,7 +105,7 @@ void activateGPRS() {
     sendATCommand("AT+SAPBR=0,1", 3000);
     sendATCommand("AT+SAPBR=0,1", 3000);
     sendATCommand("AT+SAPBR=3,1,\"Contype\",\"GPRS\"");
-    sendATCommand("AT+SAPBR=3,1,\"APN\",\"www\"");   // APN here
+    sendATCommand("AT+SAPBR=3,1,\"APN\",\"airtelgprs.com\"");   // APN here ( current SIMcard : Airtel India)
     sendATCommand("AT+SAPBR=1,1", 5000);
     sendATCommand("AT+SAPBR=2,1");
     Serial.println("GPRS Activated");
