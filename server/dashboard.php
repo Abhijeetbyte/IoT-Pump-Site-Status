@@ -1,4 +1,49 @@
 <?php
+/**
+ * ================================================================
+ *  IoT Device Dashboard Script
+ * ================================================================
+ * 
+ *  Purpose:
+ *  --------
+ *  This PHP script serves as a live dashboard interface to monitor
+ *  current and historical data for registered IoT devices. It reads 
+ *  temporary ongoing data and previously recorded event data, checks
+ *  device status (online/offline) based on timeout logic, and compiles
+ *  events when a timeout is detected.
+ * 
+ *  Author: Abhijeet Kumar
+ *  Created On: April 17, 2025
+ *  Last Modified: April 20, 2025
+ *  Version: 1.2
+ * 
+ *  Usage:
+ *  ------
+ *  Endpoint URL: dashboard.php
+ *  Optional GET Parameter:
+ *      - device : Device ID to view (e.g., ?device=01xd02m25)
+ * 
+ *  Folder Structure:
+ *  -----------------
+ *  /device_<deviceId>/
+ *      ├── temp_<deviceId>.json   ← Ongoing ping data
+ *      └── event_<deviceId>.json  ← Compiled event history
+ * 
+ *  Dependencies:
+ *  -------------
+ *  - devices.json   ← Stores list of valid device IDs
+ *  - TailwindCSS CDN for UI styling
+ * 
+ *  Behavior:
+ *  ---------
+ *  - Auto-refreshes every 5 seconds
+ *  - Displays ongoing ping data if available
+ *  - Marks device "Offline" if no ping in last 60 seconds
+ *  - Compiles offline events and clears temp file
+ *  - Shows event history table
+ * 
+ * ================================================================
+ */
 
 
 // ================= CONFIGURATION ================= //
@@ -86,7 +131,7 @@ function checkDeviceStatus($tempData) {
 
         // If DateTime object creation fails, output an error message and return
         if (!$pingDateTime) {
-            echo "<p>⚠️ Failed to parse timestamp correctly.</p>";
+            echo "<p>Failed to parse timestamp correctly.</p>";
             return;
         }
 
