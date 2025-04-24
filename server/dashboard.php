@@ -136,7 +136,7 @@ function checkDeviceStatus($tempData) {
         }
 
         // Uncomment for debugging purposes:
-        // echo "<p><strong>Parsed Ping Time:</strong> " . $pingDateTime->format('Y-m-d H:i:s') . "</p>";
+         echo "<p><strong>Parsed Ping Time:</strong> " . $pingDateTime->format('Y-m-d H:i:s') . "</p>";
 
         // Step 2: Convert the ping DateTime object to a Unix timestamp (in seconds)
         $lastPingTimestamp = $pingDateTime->getTimestamp();
@@ -146,16 +146,16 @@ function checkDeviceStatus($tempData) {
         $currentTimestamp = $now->getTimestamp();  // Convert the current time to a Unix timestamp
 
         // Uncomment for debugging purposes: 
-        // echo "<p><strong>Current Time:</strong> " . $now->format('Y-m-d H:i:s') . "</p>";
+         echo "<p><strong>Current Time:</strong> " . $now->format('Y-m-d H:i:s') . "</p>";
 
         //Calculate the time difference between the current time and the last ping
         $timeDiff = $currentTimestamp - $lastPingTimestamp;
 
         // Uncomment for debugging purposes: 
-        // echo "<p><strong>Last Ping Timestamp (in seconds):</strong> " . $lastPingTimestamp . "</p>";
-        // echo "<p><strong>Current Timestamp (in seconds):</strong> " . $currentTimestamp . "</p>";
-        // echo "<p><strong>Expected Time Difference (in seconds):</strong> " . ($currentTimestamp - $lastPingTimestamp) . "</p>";
-        // echo "<p><strong>Time Diff (in seconds):</strong> " . $timeDiff . " seconds</p>";
+         echo "<p><strong>Last Ping Timestamp (in seconds):</strong> " . $lastPingTimestamp . "</p>";
+         echo "<p><strong>Current Timestamp (in seconds):</strong> " . $currentTimestamp . "</p>";
+         echo "<p><strong>Expected Time Difference (in seconds):</strong> " . ($currentTimestamp - $lastPingTimestamp) . "</p>";
+         echo "<p><strong>Time Diff (in seconds):</strong> " . $timeDiff . " seconds</p>";
 
         // If the time difference is less than or equal to 60 seconds, the device is online
         if ($timeDiff <= 60) {
@@ -166,7 +166,7 @@ function checkDeviceStatus($tempData) {
         }
 
         // Step 6: Display the final device status
-        //echo "<p><strong>Device Status:</strong> " . $deviceStatus . "</p>";
+        echo "<p><strong>Device Status:</strong> " . $deviceStatus . "</p>";
     }
 }
 
@@ -242,7 +242,7 @@ if ($deviceStatus === "Device Offline" && !empty($tempData)) { //If the device i
 
 // If the device is online.
 
-if ($deviceStatus === "Device Online" ) { 
+if ($deviceStatus === "Device Online" && !empty($tempData)) { 
 
     // Just open the temp file.
     
@@ -252,7 +252,7 @@ if ($deviceStatus === "Device Online" ) {
     $firstPing = $tempData[0];
     $lastPing = $tempData[count($tempData) - 1];
     
-    // Make sure you're getting the values from the correct keys in tempData
+    // tempData
     $startTime = isset($firstPing['timestamp']) ? $firstPing['timestamp'] : 'N/A';
     $startDate = isset($firstPing['date']) ? $firstPing['date'] : 'N/A';
     $latestTime = isset($lastPing['timestamp']) ? $lastPing['timestamp'] : 'N/A';
@@ -272,6 +272,9 @@ if ($deviceStatus === "Device Online" ) {
 
 ?>
 
+
+<!-- HTML UI  -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -289,7 +292,7 @@ if ($deviceStatus === "Device Online" ) {
       
     <!-- Header Section -->
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold text-gray-700">IoT Device Dashboard</h1>
+      <h1 class="text-2xl font-bold text-gray-700">MARU Site Pump Status: Dashboard</h1>
       <?php if (!empty($devices)): ?>
       <form method="GET">
         <label class="mr-2 font-semibold">Select Device:</label>
@@ -310,28 +313,24 @@ if ($deviceStatus === "Device Online" ) {
 
     <!-- Ongoing Event Section -->
         <div class="bg-white p-6 rounded shadow mb-8">
-          <h2 class="text-xl font-semibold mb-4 text-blue-600">Ongoing Event</h2>
+          <h2 class="text-xl font-semibold mb-4 text-blue-600">Live Status</h2>
           
-          <?php if (!empty($tempData)): ?>
-            <p><strong>Start Time:</strong> <?= htmlspecialchars($startTime) ?></p>
-            <p><strong>Start Date:</strong> <?= htmlspecialchars($startDate) ?></p>
-            <p><strong>Latest Ping Time:</strong> <?= htmlspecialchars($latestTime) ?></p>
-            <p><strong>Latest Ping Date:</strong> <?= htmlspecialchars($latestDate) ?></p>
-            <p><strong>Latest Value:</strong> <?= htmlspecialchars($latestValue) ?> amps</p>
+         <?php if ($deviceStatus === "Device Online" && !empty($tempData)): ?>
+         
+              <span class="bg-green-200 text-green-800 px-2 py-1 rounded italic">Pump is currently running...</span>
+              <p><strong>Start Date:</strong> <?= htmlspecialchars($startDate) ?></p>
+              <p><strong>Start Time:</strong> <?= htmlspecialchars($startTime) ?></p>
+              <p><strong>Latest Ping Date:</strong> <?= htmlspecialchars($latestDate) ?></p>
+              <p><strong>Latest Ping Time:</strong> <?= htmlspecialchars($latestTime) ?></p>
+              <p><strong>Latest Value:</strong> <?= htmlspecialchars($latestValue) ?> amps</p>
+              <p><strong>Status:</strong> <span class="bg-green-200 text-green-800 px-2 py-1 rounded">🟢 Online</span></p>
             
-            <p><strong>Status:</strong> 
-              <?php if ($deviceStatus === "Device Online"): ?>
-                <span class="bg-green-200 text-green-800 px-2 py-1 rounded">🟢 Online</span>
-              <?php elseif ($deviceStatus === "Device Offline"): ?>
-                <span class="bg-red-200 text-red-800 px-2 py-1 rounded">🔴 Offline</span>
-              <?php else: ?>
-                <span class="bg-gray-200 text-gray-800 px-2 py-1 rounded">⚪ Unknown</span>
-              <?php endif; ?>
-            </p>
-        
-          <?php else: ?>
-            <p class="text-red-600">No ongoing data available for this device.</p>
-          <?php endif; ?>
+            <?php else: ?>
+              <p><strong>Status:</strong></p>
+              <span class="bg-red-200 text-red-800 px-2 py-1 rounded">🔴 Offline</span>
+              <p class="text-red-600">No ongoing data available for this device.</p>
+            <?php endif; ?>
+
         </div>
 
     
@@ -341,7 +340,7 @@ if ($deviceStatus === "Device Online" ) {
 
     <!-- Event History Section -->
     <div class="bg-white p-6 rounded shadow">
-      <h2 class="text-xl font-semibold mb-4 text-green-600">Event History</h2>
+      <h2 class="text-xl font-semibold mb-4 text-green-600">Activity Log</h2>
       <?php if (!empty($eventData)): ?>
         <div class="overflow-x-auto">
           <table class="min-w-full table-auto">
@@ -352,6 +351,7 @@ if ($deviceStatus === "Device Online" ) {
                 <th class="px-4 py-2 text-left">End Time</th>
                 <th class="px-4 py-2 text-left">Duration (s)</th>
                 <th class="px-4 py-2 text-left">Average Value (amps)</th>
+                <th class="px-4 py-2 text-left">Water Discharged (L)</th>
               </tr>
             </thead>
             <tbody>
