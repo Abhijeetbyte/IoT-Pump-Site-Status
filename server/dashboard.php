@@ -2,8 +2,8 @@
 /**
  * IoT Device Dashboard (Display Only)
  * Author: Abhijeet Kumar
- * Version: 2.0
- * Purpose: View device online status + history, without modifying any files.
+ * Version: 2.1
+ * Purpose: View device online status + event history with water discharge.
  */
 
 // Configuration
@@ -121,6 +121,7 @@ if (!empty($tempData)) {
               </tr>
             </thead>
             <tbody>
+              <?php foreach (array_reverse($eventData) as $event): ?>
                 <tr class="border-b">
                   <td class="px-4 py-2"><?= $event['date'] ?? '-' ?></td>
                   <td class="px-4 py-2"><?= $event['start_time'] ?? '-' ?></td>
@@ -128,8 +129,8 @@ if (!empty($tempData)) {
                   <td class="px-4 py-2"><?= $event['duration'] ?? '-' ?></td>
                   <td class="px-4 py-2"><?= $event['average_value'] ?? '-' ?></td>
                   <td class="px-4 py-2"><?= $event['discharge_litres'] ?? '-' ?></td>
-
                 </tr>
+              <?php endforeach; ?>
             </tbody>
           </table>
         </div>
