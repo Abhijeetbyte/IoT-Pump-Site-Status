@@ -28,7 +28,7 @@
  * 
  *  Example Request:
  *  ----------------
- *  http://yourdomain.com/api.php?current=4.5&timestamp=2025-04-11 14:22:01&timezone=Asia/Kolkata&deviceId=01xd02m25
+ *  http://yourdomain.com/api.php?current=4.5&timestamp=2025-04-11 14:22:01&timezone=Asia/Kolkata&deviceId=your_device_id
  * 
  *  Folder Structure:
  *  -----------------
