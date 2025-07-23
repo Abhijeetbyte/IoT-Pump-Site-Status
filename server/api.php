@@ -1,25 +1,24 @@
 <?php
 
 /**
- * IoT Device Data Receiver & Event Generator
- * 
- * Features:
- * 1. Receives current + timestamp + timezone + deviceId
- * 2. Appends to temp_<deviceId>.json
- * 3. If delay > 60s since last ping, logs an event with discharge volume
- * 
+ * IoT Device Data Receiver & Event Logger
+ * Version: 2.2
  * Author: Abhijeet Kumar
- * Version: 2.1
- * Date: July 2025
+ * Updated: July 24, 2025
+ * 
+ * - Receives: current, timestamp, timezone, deviceId
+ * - Checks delay from last ping (strictly sequential)
+ * - Logs event if delay > 60s
+ * - Calculates discharge in litres
  */
 
-// ------------------- CONFIG ------------------- //
+// ---------------- CONFIG ---------------- //
 
 $deviceIdFile = 'devices.json';
+$dischargeCoefficient = 0.5; // L/sec
 date_default_timezone_set('Asia/Kolkata');
-$dischargeCoefficient = 0.5; // K (litres per second)
 
-// ------------------- FUNCTIONS ------------------- //
+// ---------------- FUNCTIONS ---------------- //
 
 function sanitize($data) {
     return htmlspecialchars(strip_tags(trim($data)), ENT_QUOTES, 'UTF-8');
@@ -33,7 +32,7 @@ function saveJson($file, $data) {
     return file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT));
 }
 
-// ------------------- INPUT ------------------- //
+// ---------------- INPUT ---------------- //
 
 $current   = isset($_GET['current'])   ? sanitize($_GET['current'])   : '';
 $timestamp = isset($_GET['timestamp']) ? sanitize($_GET['timestamp']) : '';
@@ -56,7 +55,7 @@ if (!in_array($deviceId, $registeredDevices)) {
     exit;
 }
 
-// ------------------- SETUP FILE PATHS ------------------- //
+// ---------------- PATHS ---------------- //
 
 $folder = "device_{$deviceId}";
 if (!is_dir($folder)) {
@@ -69,28 +68,30 @@ if (!is_dir($folder)) {
 $tempFile  = "$folder/temp_{$deviceId}.json";
 $eventFile = "$folder/event_{$deviceId}.json";
 
-// ------------------- LOAD DATA ------------------- //
-
 $tempData  = loadJson($tempFile);
 $eventData = loadJson($eventFile);
 
-// ------------------- CHECK FOR DELAY ------------------- //
+// ---------------- CHECK GAP (STRICT) ---------------- //
 
 $pingDelayExceeded = false;
 
+$tz = new DateTimeZone($timezone);
+$currentPingDT = DateTime::createFromFormat('Y-m-d H:i:s', $timestamp, $tz);
+
 if (!empty($tempData)) {
     $lastPing = end($tempData)['timestamp'];
-    $lastZone = end($tempData)['timezone'];
-    $lastDT   = DateTime::createFromFormat('Y-m-d H:i:s', $lastPing, new DateTimeZone($lastZone));
-    $now      = new DateTime('now', new DateTimeZone($lastZone));
-    $timeDiff = $now->getTimestamp() - $lastDT->getTimestamp();
+    $lastPingDT = DateTime::createFromFormat('Y-m-d H:i:s', $lastPing, $tz);
 
-    if ($timeDiff > 60) {
-        $pingDelayExceeded = true;
+    if ($currentPingDT && $lastPingDT) {
+        $gap = $currentPingDT->getTimestamp() - $lastPingDT->getTimestamp();
+
+        if ($gap > 60) {
+            $pingDelayExceeded = true;
+        }
     }
 }
 
-// ------------------- EVENT CREATION ------------------- //
+// ---------------- COMPILE EVENT ---------------- //
 
 if ($pingDelayExceeded && count($tempData) > 1) {
     $startTimestamp = $tempData[0]['timestamp'];
@@ -98,8 +99,6 @@ if ($pingDelayExceeded && count($tempData) > 1) {
     $duration       = strtotime($endTimestamp) - strtotime($startTimestamp);
     $totalValue     = array_sum(array_column($tempData, 'value'));
     $averageValue   = number_format($totalValue / count($tempData), 2);
-
-    // Compute discharge in litres
     $dischargeLitres = round($duration * $dischargeCoefficient, 2);
 
     $eventEntry = [
@@ -114,10 +113,12 @@ if ($pingDelayExceeded && count($tempData) > 1) {
 
     $eventData[] = $eventEntry;
     saveJson($eventFile, $eventData);
-    $tempData = []; // Reset temp data after event
+
+    // Reset tempData to store only current ping
+    $tempData = [];
 }
 
-// ------------------- APPEND NEW PING ------------------- //
+// ---------------- APPEND NEW PING ---------------- //
 
 $tempData[] = [
     "timestamp" => $timestamp,
@@ -131,8 +132,7 @@ if (!saveJson($tempFile, $tempData)) {
     exit;
 }
 
-// ------------------- SUCCESS ------------------- //
+// ---------------- DONE ---------------- //
 
-echo "Ping received. Status: " . ($pingDelayExceeded ? "Delay detected. Event logged." : "Normal ping.");
-
+echo "Ping received. Status: " . ($pingDelayExceeded ? "Delay detected. Event compiled." : "Normal ping.");
 ?>
