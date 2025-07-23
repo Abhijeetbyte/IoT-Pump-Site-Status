@@ -93,7 +93,8 @@ if (!empty($tempData)) {
 
 // ---------------- COMPILE EVENT ---------------- //
 
-if ($pingDelayExceeded && count($tempData) >= 1) {
+// Only compile event if at least two pings exist to calculate valid duration and average
+if ($pingDelayExceeded && count($tempData) >= 2) {
     $startTimestamp = $tempData[0]['timestamp'];
     $endTimestamp   = end($tempData)['timestamp'];
     $duration       = strtotime($endTimestamp) - strtotime($startTimestamp);
