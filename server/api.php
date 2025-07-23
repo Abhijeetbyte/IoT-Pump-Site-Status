@@ -6,10 +6,10 @@
  * Features:
  * 1. Receives current + timestamp + timezone + deviceId
  * 2. Appends to temp_<deviceId>.json
- * 3. If delay > 60s since last ping, logs an event
+ * 3. If delay > 60s since last ping, logs an event with discharge volume
  * 
  * Author: Abhijeet Kumar
- * Version: 2.0
+ * Version: 2.1
  * Date: July 2025
  */
 
@@ -17,6 +17,7 @@
 
 $deviceIdFile = 'devices.json';
 date_default_timezone_set('Asia/Kolkata');
+$dischargeCoefficient = 0.5; // K (litres per second)
 
 // ------------------- FUNCTIONS ------------------- //
 
@@ -98,18 +99,22 @@ if ($pingDelayExceeded && count($tempData) > 1) {
     $totalValue     = array_sum(array_column($tempData, 'value'));
     $averageValue   = number_format($totalValue / count($tempData), 2);
 
+    // Compute discharge in litres
+    $dischargeLitres = round($duration * $dischargeCoefficient, 2);
+
     $eventEntry = [
-        "deviceId"      => $deviceId,
-        "date"          => $tempData[0]['date'],
-        "start_time"    => $startTimestamp,
-        "end_time"      => $endTimestamp,
-        "duration"      => $duration,
-        "average_value" => $averageValue
+        "deviceId"         => $deviceId,
+        "date"             => $tempData[0]['date'],
+        "start_time"       => $startTimestamp,
+        "end_time"         => $endTimestamp,
+        "duration"         => $duration,
+        "average_value"    => $averageValue,
+        "discharge_litres" => $dischargeLitres
     ];
 
     $eventData[] = $eventEntry;
     saveJson($eventFile, $eventData);
-    $tempData = []; // Reset temp data
+    $tempData = []; // Reset temp data after event
 }
 
 // ------------------- APPEND NEW PING ------------------- //
