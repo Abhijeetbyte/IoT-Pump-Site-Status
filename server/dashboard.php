@@ -121,20 +121,15 @@ if (!empty($tempData)) {
               </tr>
             </thead>
             <tbody>
-              <?php foreach (array_reverse($eventData) as $event): ?>
-                <?php
-                  $K = 0.5; // Discharge constant (L per amp-second)
-                  $Q = round(($event['average_value'] ?? 0) * ($event['duration'] ?? 0) * $K, 2);
-                ?>
                 <tr class="border-b">
                   <td class="px-4 py-2"><?= $event['date'] ?? '-' ?></td>
                   <td class="px-4 py-2"><?= $event['start_time'] ?? '-' ?></td>
                   <td class="px-4 py-2"><?= $event['end_time'] ?? '-' ?></td>
                   <td class="px-4 py-2"><?= $event['duration'] ?? '-' ?></td>
                   <td class="px-4 py-2"><?= $event['average_value'] ?? '-' ?></td>
-                  <td class="px-4 py-2"><?= $Q ?></td>
+                  <td class="px-4 py-2"><?= $event['discharge_litres'] ?? '-' ?></td>
+
                 </tr>
-              <?php endforeach; ?>
             </tbody>
           </table>
         </div>
