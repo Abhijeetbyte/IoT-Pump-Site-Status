@@ -93,30 +93,34 @@ if (!empty($tempData)) {
 
 // ---------------- COMPILE EVENT ---------------- //
 
-if ($pingDelayExceeded && count($tempData) > 1) {
+if ($pingDelayExceeded && count($tempData) >= 1) {
     $startTimestamp = $tempData[0]['timestamp'];
     $endTimestamp   = end($tempData)['timestamp'];
     $duration       = strtotime($endTimestamp) - strtotime($startTimestamp);
-    $totalValue     = array_sum(array_column($tempData, 'value'));
-    $averageValue   = number_format($totalValue / count($tempData), 2);
-    $dischargeLitres = round($duration * $dischargeCoefficient, 2);
 
-    $eventEntry = [
-        "deviceId"         => $deviceId,
-        "date"             => $tempData[0]['date'],
-        "start_time"       => $startTimestamp,
-        "end_time"         => $endTimestamp,
-        "duration"         => $duration,
-        "average_value"    => $averageValue,
-        "discharge_litres" => $dischargeLitres
-    ];
+    if ($duration > 0) {
+        $totalValue     = array_sum(array_column($tempData, 'value'));
+        $averageValue   = number_format($totalValue / count($tempData), 2);
+        $dischargeLitres = round($duration * $dischargeCoefficient, 2);
 
-    $eventData[] = $eventEntry;
-    saveJson($eventFile, $eventData);
+        $eventEntry = [
+            "deviceId"         => $deviceId,
+            "date"             => $tempData[0]['date'],
+            "start_time"       => $startTimestamp,
+            "end_time"         => $endTimestamp,
+            "duration"         => $duration,
+            "average_value"    => $averageValue,
+            "discharge_litres" => $dischargeLitres
+        ];
 
-    // Reset tempData to store only current ping
+        $eventData[] = $eventEntry;
+        saveJson($eventFile, $eventData);
+    }
+
+    // Reset tempData and keep only the current (delayed) ping
     $tempData = [];
 }
+
 
 // ---------------- APPEND NEW PING ---------------- //
 
