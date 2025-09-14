@@ -65,22 +65,83 @@ if (!empty($tempData)) {
 <body class="bg-gray-100 p-6">
   <div class="max-w-5xl mx-auto">
 
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold text-gray-700">MARU Site Pump Status: Dashboard</h1>
-      <?php if (!empty($devices)): ?>
-        <form method="GET">
-          <label class="mr-2 font-semibold">Select Device:</label>
-          <select name="device" onchange="this.form.submit()" class="px-2 py-1 border rounded">
-            <?php foreach ($devices as $device): ?>
-              <option value="<?= $device ?>" <?= $device === $selectedDevice ? 'selected' : '' ?>><?= $device ?></option>
-            <?php endforeach; ?>
-          </select>
-        </form>
-      <?php else: ?>
-        <p class="text-red-600">No devices found.</p>
-      <?php endif; ?>
-    </div>
+        <!-- Top toolbar: device selector (left-aligned) -->
+        <div class="mb-4">
+          <?php if (!empty($devices)): ?>
+            <form method="GET" class="inline-flex items-center gap-2">
+              <label for="device" class="font-semibold">Select Device:</label>
+              <select id="device" name="device" onchange="this.form.submit()" class="px-2 py-1 border rounded">
+                <?php foreach ($devices as $device): ?>
+                  <option value="<?= $device ?>" <?= $device === $selectedDevice ? 'selected' : '' ?>><?= $device ?></option>
+                <?php endforeach; ?>
+              </select>
+            </form>
+          <?php else: ?>
+            <p class="text-red-600">No devices found.</p>
+          <?php endif; ?>
+        </div>
+        
+        <!-- Heading (centered) -->
+        <div class="mb-6 text-center">
+          <h1 class="text-2xl font-bold text-gray-700">
+            Middle School Udwantnagar, Bhojpur, Bihar MARU Site Pump Status : Dashboard
+          </h1>
+        </div>
+        
+        <!-- Banner + Geo (stack) -->
+        <?php
+          $latitude  = $latitude  ?? 25.570399;
+          $longitude = $longitude ?? 84.525861;
+        
+          $haveCoords = isset($latitude, $longitude) && $latitude !== '' && $longitude !== '';
+          if ($haveCoords) {
+            $lat = number_format((float)$latitude, 6, '.', '');
+            $lng = number_format((float)$longitude, 6, '.', '');
+            $mapsUrl = "https://maps.google.com/?q={$lat},{$lng}";
+          }
+        ?>
+        
+        <div class="flex flex-col items-center space-y-3 mb-6">
+          <!-- Banner -->
+          <div class="w-full max-w-[720px] px-2">
+            <img
+              src="banner-site-image.jpg"
+              alt="MARU Site — Udwantnagar Banner"
+              class="w-full h-48 sm:h-64 md:h-72 object-cover rounded-xl shadow"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        
+          <!-- Coordinates + Maps link -->
+          <div class="w-full max-w-[720px] px-2">
+            <?php if ($haveCoords): ?>
+              <div class="bg-white rounded-lg shadow p-3 text-sm text-gray-700 flex flex-wrap items-center gap-x-3 gap-y-1">
+                <span class="font-semibold">Coordinates:</span>
+                <span>Lat: <?= $lat ?>, Lng: <?= $lng ?></span>
+                <a
+                  href="<?= htmlspecialchars($mapsUrl, ENT_QUOTES) ?>"
+                  target="_blank" rel="noopener"
+                  class="ml-auto inline-flex items-center underline decoration-dotted hover:no-underline text-green-800 font-bold"
+                >
+                  Open in Google Maps
+                  <svg xmlns="http://www.w3.org/2000/svg" class="ml-1 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M21 10.5c0 7.5-9 11-9 11s-9-3.5-9-11a9 9 0 1118 0z" />
+                    <circle cx="12" cy="10.5" r="3" stroke-width="2"/>
+                  </svg>
+                </a>
+              </div>
+            <?php else: ?>
+              <div class="bg-white rounded-lg shadow p-3 text-sm text-gray-600 italic">
+                Coordinates unavailable.
+              </div>
+            <?php endif; ?>
+          </div>
+        </div>
+
+      
+      
 
     <!-- Live Status -->
     <div class="bg-white p-6 rounded shadow mb-8">
@@ -116,8 +177,8 @@ if (!empty($tempData)) {
                 <th class="px-4 py-2 text-left">Start Time</th>
                 <th class="px-4 py-2 text-left">End Time</th>
                 <th class="px-4 py-2 text-left">Duration (s)</th>
-                <th class="px-4 py-2 text-left">Average Value (amps)</th>
-                <th class="px-4 py-2 text-left">Water Discharged (L)</th>
+                <th class="px-4 py-2 text-left">Average Value (Amps) ± 0.5A</th>
+                <th class="px-4 py-2 text-left">Approx Water Discharged (L) by L/s cal. ±50L</th>
               </tr>
             </thead>
             <tbody>
