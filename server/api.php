@@ -22,7 +22,7 @@
 // ---------------- CONFIGURATION ---------------- //
 
 $deviceIdFile = 'devices.json';             // List of valid device IDs
-$dischargeCoefficient = 0.5;               // Water discharge rate (L/sec)
+$dischargeCoefficient = 0.87;               // Water discharge rate (L/sec)
 date_default_timezone_set('Asia/Kolkata'); // Fallback timezone
 
 
