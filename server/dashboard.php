@@ -1,20 +1,23 @@
 <?php
- 
- /**
+/**
  * ================================================================
  * IoT Device Dashboard (Display Only)
- * Version: 2.1
- * Author: Abhijeet Kumar
- * Created on  : July 25, 2025
- * Last Updated: March 29, 2026
- * 
+ * Version       : 2.1
+ * Author        : Abhijeet Kumar
+ * Created On    : July 25, 2025
+ * Last Updated  : March 29, 2026
+ *
  * Description:
  * ------------
- * - Read data, from  respective device data file, based on selected device ID
- * - Display that data into, the Dashboard screen,  online status + event history with water discharge.
- * - Stores live pings in a temporary file
+ * - Retrieves data from the corresponding device data file based on the selected Device ID.
+ * - Displays the data on the dashboard, including:
+ *      - Online/Offline status
+ *      - Event history
+ *      - Water discharge details
+ 
  * ================================================================
  */
+ 
  
 
 // Configuration
