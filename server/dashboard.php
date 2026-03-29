@@ -3,6 +3,7 @@
  * IoT Device Dashboard (Display Only)
  * Author: Abhijeet Kumar
  * Version: 2.1
+ * Last Update : 29-03-2026
  * Purpose: View device online status + event history with water discharge.
  */
 
@@ -178,7 +179,7 @@ if (!empty($tempData)) {
                 <th class="px-4 py-2 text-left">End Time</th>
                 <th class="px-4 py-2 text-left">Duration (s)</th>
                 <th class="px-4 py-2 text-left">Average Value (Amps) ± 0.5A</th>
-                <th class="px-4 py-2 text-left">Approx Water Discharged (L) by L/s cal. ±50L</th>
+                <th class="px-4 py-2 text-left">Approx Water Discharged (L) by L/s cal. ±10L</th>
               </tr>
             </thead>
             <tbody>
