@@ -1,11 +1,21 @@
 <?php
-/**
+ 
+ /**
+ * ================================================================
  * IoT Device Dashboard (Display Only)
- * Author: Abhijeet Kumar
  * Version: 2.1
- * Last Update : 29-03-2026
- * Purpose: View device online status + event history with water discharge.
+ * Author: Abhijeet Kumar
+ * Created on  : July 25, 2025
+ * Last Updated: March 29, 2026
+ * 
+ * Description:
+ * ------------
+ * - Read data, from  respective device data file, based on selected device ID
+ * - Display that data into, the Dashboard screen,  online status + event history with water discharge.
+ * - Stores live pings in a temporary file
+ * ================================================================
  */
+ 
 
 // Configuration
 $deviceIdFile = 'devices.json';
